@@ -67,3 +67,23 @@ li {
 p {
     color: var(--text_color2);
 }
+
+/* Gantt Charts*/
+
+.content-container {
+    width: fit-content;
+    margin: auto;
+    margin-top: 50px;
+    border: 2px solid white;
+    padding: 20px 20px 0px 20px;
+}
+
+.weekly-header {
+    color: var(--text_color1);
+    font-size: 1.2em;
+    line-height: 0.5em;
+    font-weight: bold;
+}
+.weekly-subheader {
+    line-height: 0.5em;
+}
