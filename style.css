@@ -64,11 +64,20 @@ li {
     font-size: var(--text_size1);
 }
 
+.link {
+	color: var(--text_color2);
+	transition: 1s;
+}
+.link:hover {
+	color: var(--text_color1);
+	transition: 1s;
+}
+
 p {
     color: var(--text_color2);
 }
 
-/* Gantt Charts*/
+/* Gantt Charts */
 
 .content-container {
     width: 30%;
@@ -94,4 +103,17 @@ p {
 .weekly-description {
 	color: var(--text_color1);
 	font-size: 1.05rem;
+}
+
+/* Implementation */
+
+#impl-contents-table {
+    width: fit-content;
+    margin: auto;
+    border: 2px solid white;
+    padding: 20px 100px 20px 100px;
+}
+.impl-link {
+	font-size: var(--text_size1);
+	line-height: 2em;
 }
