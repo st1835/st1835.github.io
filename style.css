@@ -71,7 +71,7 @@ p {
 /* Gantt Charts*/
 
 .content-container {
-    width: fit-content;
+    width: 30%;
     margin: auto;
     margin-top: 50px;
     border: 2px solid white;
@@ -89,4 +89,9 @@ p {
 }
 .gantt-chart-img {
 	width: 400px;
+}
+
+.weekly-description {
+	color: var(--text_color1);
+	font-size: 1.05rem;
 }
