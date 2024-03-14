@@ -87,3 +87,6 @@ p {
 .weekly-subheader {
     line-height: 0.5em;
 }
+.gantt-chart-img {
+	width: 400px;
+}
