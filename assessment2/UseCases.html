@@ -1,56 +1,63 @@
-<h1 id="player-performs-an-activity">Player performs an activity</h1>
-<p>Primary Actor: Player</p>
-<p>Supporting Actors: N/A</p>
-<p>Precondition: Less than seven in-game days have elapsed.</p>
-<p>Trigger: Player selects a location on the map to interact with</p>
-<p>Main Success Scenario:</p>
-<ul>
-<li>The player performs the activity available at the selected location</li>
-<li>The system records the activity performed, so it can compute the score</li>
-<li>The player’s energy is decreased as appropriate.</li>
-<li>In game time moves forward the appropriate amount.</li>
-</ul>
-<p>Secondary Scenario:</p>
-<ul>
-<li>The player does not have enough energy or time left to perform the activity. They are informed as such.</li>
-</ul>
-<p>Success Postcondition: The player is able to perform the selected activity.</p>
-<p>Minimal Postcondition: The player has zero or more energy and the in-game time elapsed for the day has not exceeded 16 hours.</p>
-<h1 id="player-moves-around-the-map">Player moves around the map</h1>
-<p>Primary Actor: Player</p>
-<p>Supporting Actors: N/A</p>
-<p>Precondition: Less than seven in-game days have elapsed.</p>
-<p>Trigger: Player uses an input device (keyboard / mouse) to control the character.</p>
-<p>Main Success Scenario:</p>
-<ul>
-<li>The system recognises the input as valid.</li>
-<li>The player’s current location permits them to move in the desired direction.</li>
-<li>The character moves across the screen according to the input.</li>
-</ul>
-<p>Secondary Scenarios:</p>
-<ul>
-<li><p>1</p>
-<ul>
-<li>The game does not recognise the input.</li>
-<li>The game state does not change</li>
-</ul>
-</li>
-<li><p>2</p>
-<ul>
-<li>The input is not permitted as there are no routes that the player can follow in the specified direction.</li>
-<li>The game state does not change</li>
-</ul>
-</li>
-</ul>
-<p>Success Postcondition: The player can move across the map in such a way that they can visit every activity.</p>
-<p>Minimal Postcondition: The player is always visible on the screen</p>
-<h1 id="game-over">Game over</h1>
-<p>Primary Actor: Player</p>
-<p>Supporting Actors: N/A</p>
-<p>Precondition: Exactly 7 in-game days have elapsed.</p>
-<p>Trigger: Player sleeps at the end of the seventh day.</p>
-<p>Main Success Scenario:</p>
-<ul>
-<li>The player is presented with a game-over screen, informing them of their score, and possibly offering suggestions for how they can do better next time.</li>
-</ul>
-<p>Postcondition: The game is over</p>
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Heslington Hustle</title>
+        <link rel="stylesheet" href="style.css"/>
+    </head>
+    <body>
+        <div id="container">
+            <h1 id="player-performs-an-activity">Player performs an activity</h1>
+            <p>Primary Actor: Player</p>
+            <p>Supporting Actors: N/A</p>
+            <p>Precondition: Less than seven in-game days have elapsed.</p>
+            <p>Trigger: Player selects a location on the map to interact with</p>
+            <p>Main Success Scenario:</p>
+            <ul>
+            <li>The player performs the activity available at the selected location</li>
+            <li>The system records the activity performed, so it can compute the score</li>
+            <li>The player’s energy is decreased as appropriate.</li>
+            <li>In game time moves forward the appropriate amount.</li>
+            </ul>
+            <p>Secondary Scenario:</p>
+            <ul>
+            <li>The player does not have enough energy or time left to perform the activity. They are informed as such.</li>
+            </ul>
+            <p>Success Postcondition: The player is able to perform the selected activity.</p>
+            <p>Minimal Postcondition: The player has zero or more energy and the in-game time elapsed for the day has not exceeded 16 hours.</p>
+            <h1 id="player-moves-around-the-map">Player moves around the map</h1>
+            <p>Primary Actor: Player</p>
+            <p>Supporting Actors: N/A</p>
+            <p>Precondition: Less than seven in-game days have elapsed.</p>
+            <p>Trigger: Player uses an input device (keyboard / mouse) to control the character.</p>
+            <p>Main Success Scenario:</p>
+            <ul>
+            <li>The system recognises the input as valid.</li>
+            <li>The player’s current location permits them to move in the desired direction.</li>
+            <li>The character moves across the screen according to the input.</li>
+            </ul>
+            <p>Secondary Scenarios:</p>
+            <p>1:</p>
+            <ul>
+            <li>The game does not recognise the input.</li>
+            <li>The game state does not change</li>
+            </ul>
+            <p>2:</p>
+            <ul>
+            <li>The input is not permitted as there are no routes that the player can follow in the specified direction.</li>
+            <li>The game state does not change</li>
+            </ul>
+            <p>Success Postcondition: The player can move across the map in such a way that they can visit every activity.</p>
+            <p>Minimal Postcondition: The player is always visible on the screen</p>
+            <h1 id="game-over">Game over</h1>
+            <p>Primary Actor: Player</p>
+            <p>Supporting Actors: N/A</p>
+            <p>Precondition: Exactly 7 in-game days have elapsed.</p>
+            <p>Trigger: Player sleeps at the end of the seventh day.</p>
+            <p>Main Success Scenario:</p>
+            <ul>
+            <li>The player is presented with a game-over screen, informing them of their score, and possibly offering suggestions for how they can do better next time.</li>
+            </ul>
+            <p>Postcondition: The game is over</p>
+        </div>
+    </body>
+</html>
