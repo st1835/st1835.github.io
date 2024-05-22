@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MapGraph.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">io.eng1.group9.gamestate</a> &gt; <span class="el_source">MapGraph.java</span></div><h1>MapGraph.java</h1><pre class="source lang-java linenums">package io.eng1.group9.gamestate;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.math.Vector2;
+import io.eng1.group9.gamestate.activities.Eat;
+import io.eng1.group9.gamestate.activities.Recreation;
+import io.eng1.group9.gamestate.activities.Sleep;
+import io.eng1.group9.gamestate.activities.Study;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+/**
+ * Holds all the information regarding the tile positions of each node in the map.
+ */
+public class MapGraph {
+
+  // maps a position to reachable adjacent positions
+  private final HashMap&lt;Vector2, List&lt;Vector2&gt;&gt; fullMap;
+
+  // maps a position to a node (and therefore what activities can be performed at that position)
+  private final HashMap&lt;Vector2, Node&gt; nodeMap;
+
+  private final String filename;
+
+  /**
+   * Instantiates a new Map graph.
+   *
+   * @param filename the filename
+   */
+<span class="fc" id="L32">  public MapGraph(String filename) {</span>
+<span class="fc" id="L33">    fullMap = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L34">    nodeMap = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L35">    this.filename = filename;</span>
+<span class="fc" id="L36">    readGridFromFile();</span>
+<span class="fc" id="L37">  }</span>
+
+
+  /**
+   * Read the grid from a file.
+   */
+  private void readGridFromFile() {
+<span class="fc" id="L44">    FileHandle fileHandle = Gdx.files.internal(this.filename);</span>
+<span class="fc" id="L45">    String fileContents = fileHandle.readString();</span>
+<span class="fc" id="L46">    String[] lines = fileContents.split(&quot;\\r?\\n&quot;);</span>
+    // Define the maximum column size of the grid
+<span class="fc" id="L48">    int maxY = lines.length;</span>
+    // Define the maximum row size of the grid
+<span class="fc" id="L50">    int maxX = lines[0].toCharArray().length;</span>
+
+    // Loops through the rows
+<span class="fc bfc" id="L53" title="All 2 branches covered.">    for (int y = 0; y &lt; maxY; y++) {</span>
+      // Loops through the columns
+<span class="fc bfc" id="L55" title="All 2 branches covered.">      for (int x = 0; x &lt; maxX; x++) {</span>
+        // Gets current char
+<span class="fc" id="L57">        char symbol = lines[y].toCharArray()[x];</span>
+<span class="fc bfc" id="L58" title="All 2 branches covered.">        if (symbol == '0') {</span>
+<span class="fc" id="L59">          continue;</span>
+        }
+        // Add 1 to offset x and inverts y
+<span class="fc" id="L62">        addTile(x, maxY - y - 1, getNodeFromSymbol(symbol));</span>
+      }
+    }
+<span class="fc" id="L65">    generateEdges();</span>
+<span class="fc" id="L66">  }</span>
+
+  /**
+   * Creates edges for the all tiles in map.
+   */
+  private void generateEdges() {
+    // Manually define blocked connections, to avoid adjacent nodes incorrectly
+    // connecting where a square of X's exist in the text file
+<span class="fc" id="L74">    HashMap&lt;Vector2, Vector2&gt; blockedConnections = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L75">    blockedConnections.put(new Vector2(2, 2), new Vector2(2, 3));</span>
+<span class="fc" id="L76">    blockedConnections.put(new Vector2(11, 1), new Vector2(12, 1));</span>
+<span class="fc" id="L77">    blockedConnections.put(new Vector2(10, 4), new Vector2(10, 5));</span>
+
+    // Loops through all tiles in map
+<span class="fc bfc" id="L80" title="All 2 branches covered.">    for (Vector2 location : fullMap.keySet()) {</span>
+      // Up, Down, Right, Left
+<span class="fc" id="L82">      Vector2[] directions =</span>
+        {new Vector2(0, 1), new Vector2(0, -1), new Vector2(1, 0), new Vector2(-1, 0)};
+
+      // Checks if they have adjacent cells and adds them as an edge
+<span class="fc bfc" id="L86" title="All 2 branches covered.">      for (Vector2 direction : directions) {</span>
+<span class="fc" id="L87">        Vector2 newPosition = location.cpy().add(direction);</span>
+
+        // Skip defined nodes which should not connect
+<span class="fc bfc" id="L90" title="All 2 branches covered.">        if (isBlocked(location, newPosition, blockedConnections)) {</span>
+<span class="fc" id="L91">          continue;</span>
+        }
+<span class="fc" id="L93">        addIfInMap(location, newPosition);</span>
+      }
+<span class="fc" id="L95">    }</span>
+<span class="fc" id="L96">  }</span>
+
+  /**
+   * Returns true if nodes should not be connected, also checks reverse direction.
+   *
+   * @param from               The starting position vector of the proposed connection.
+   * @param to                 The ending position vector of the proposed connection.
+   * @param blockedConnections A map containing pairs of vectors representing explicitly blocked
+   *                           connections.
+   * @return true if the connection between the nodes is blocked, false otherwise.
+   */
+  private boolean isBlocked(Vector2 from, Vector2 to,
+                            HashMap&lt;Vector2, Vector2&gt; blockedConnections) {
+<span class="fc bfc" id="L109" title="All 4 branches covered.">    return (blockedConnections.containsKey(from) &amp;&amp; blockedConnections.get(from).equals(to))</span>
+<span class="fc bfc" id="L110" title="All 4 branches covered.">        || (blockedConnections.containsKey(to) &amp;&amp; blockedConnections.get(to).equals(from));</span>
+  }
+
+  /**
+   * Adds the edges if the node exists.
+   *
+   * @param location  first tile location
+   * @param neighbour Second tile location
+   */
+  private void addIfInMap(Vector2 location, Vector2 neighbour) {
+<span class="fc bfc" id="L120" title="All 2 branches covered.">    if (fullMap.containsKey(neighbour)) {</span>
+<span class="fc" id="L121">      addEdge(location, neighbour);</span>
+    }
+<span class="fc" id="L123">  }</span>
+
+  /**
+   * Returns the node based on the letter.
+   *
+   * @param symbol Letter to generate node based on
+   * @return The activity node that maps to that symbol
+   */
+  private Node getNodeFromSymbol(char symbol) {
+<span class="fc bfc" id="L132" title="All 8 branches covered.">    switch (symbol) {</span>
+      case 'C':
+<span class="fc" id="L134">        return new Node(new Study(25, 25, &quot;Study&quot;));</span>
+      case 'S':
+<span class="fc" id="L136">        return new Node(new Sleep(0, 0, &quot;Sleep&quot;));</span>
+      case 'G':
+<span class="fc" id="L138">        return new Node(new Recreation(10, 25, &quot;Exercise&quot;));</span>
+      case 'E':
+<span class="fc" id="L140">        return new Node(new Eat(5, 0, &quot;Eat&quot;));</span>
+      case 'F':
+<span class="fc" id="L142">        return new Node(new Recreation(5, 10, &quot;Feed ducks&quot;));</span>
+      case 'L':
+<span class="fc" id="L144">        return new Node(new Recreation(5, 0, &quot;Relax at lake&quot;));</span>
+      case 'T':
+<span class="fc" id="L146">        return new Node(new Recreation(5, 20, &quot;Head to town&quot;));</span>
+      default:
+<span class="fc" id="L148">        return new Node();</span>
+    }
+  }
+
+
+  /**
+   * Gets full map.
+   *
+   * @return the full map
+   */
+  public HashMap&lt;Vector2, List&lt;Vector2&gt;&gt; getFullMap() {
+<span class="fc" id="L159">    return fullMap;</span>
+  }
+
+  /**
+   * Gets node map.
+   *
+   * @return the node map
+   */
+  public HashMap&lt;Vector2, Node&gt; getNodeMap() {
+<span class="fc" id="L168">    return nodeMap;</span>
+  }
+
+
+  /**
+   * Add a TilePosition to the fullMap and nodeMap.
+   *
+   * @param x the row of the Tile
+   * @param y the column of the Tile
+   * @param nod the list of activities associated with that tile
+   */
+  private void addTile(int x, int y, Node nod) {
+<span class="fc" id="L180">    fullMap.putIfAbsent(new Vector2(x, y), new ArrayList&lt;&gt;());</span>
+<span class="fc" id="L181">    nodeMap.putIfAbsent(new Vector2(x, y), nod);</span>
+<span class="fc" id="L182">  }</span>
+
+
+  /**
+   * Connect all the paths between tiles.
+   *
+   * @param tile1 the first vector
+   * @param tile2 the second vector
+   */
+  private void addEdge(Vector2 tile1, Vector2 tile2) {
+<span class="fc" id="L192">    fullMap.get(tile1).add(tile2);</span>
+<span class="fc" id="L193">    fullMap.get(tile2).add(tile1);</span>
+<span class="fc" id="L194">  }</span>
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

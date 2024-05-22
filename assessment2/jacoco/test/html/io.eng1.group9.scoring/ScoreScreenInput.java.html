@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ScoreScreenInput.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">io.eng1.group9.scoring</a> &gt; <span class="el_source">ScoreScreenInput.java</span></div><h1>ScoreScreenInput.java</h1><pre class="source lang-java linenums">package io.eng1.group9.scoring;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
+import io.eng1.group9.HustleGame;
+
+/**
+ * Input handler for EndScreen.
+ */
+class ScoreScreenInput extends InputAdapter {
+  /**
+   * The Game.
+   */
+  HustleGame game;
+
+  /**
+   * Instantiates a new End screen input.
+   *
+   * @param game HustleGame object that controls the application
+   */
+<span class="nc" id="L22">  public ScoreScreenInput(HustleGame game) {</span>
+<span class="nc" id="L23">    this.game = game;</span>
+<span class="nc" id="L24">  }</span>
+
+  /**
+   * Handle user keyboard input.
+   *
+   * @param keycode the key pressed
+   * @return true if handled, false otherwise
+   */
+  @Override
+  public boolean keyDown(int keycode) {
+<span class="nc bnc" id="L34" title="All 3 branches missed.">    switch (keycode) {</span>
+      case Input.Keys.Q:
+<span class="nc" id="L36">        finish();</span>
+<span class="nc" id="L37">        return true;</span>
+      case Input.Keys.ENTER:
+<span class="nc" id="L39">        game.restartGame();</span>
+<span class="nc" id="L40">        return true;</span>
+      default:
+<span class="nc" id="L42">        return false;</span>
+    }
+  }
+
+  /**
+   * Exit the application.
+   */
+  private void finish() {
+<span class="nc" id="L50">    Gdx.app.exit();</span>
+<span class="nc" id="L51">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

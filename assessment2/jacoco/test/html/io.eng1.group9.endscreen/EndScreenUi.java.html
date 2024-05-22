@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EndScreenUi.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">io.eng1.group9.endscreen</a> &gt; <span class="el_source">EndScreenUi.java</span></div><h1>EndScreenUi.java</h1><pre class="source lang-java linenums">package io.eng1.group9.endscreen;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import io.eng1.group9.HustleGame;
+import io.eng1.group9.ScreenUi;
+import io.eng1.group9.scoring.ScoreManager;
+import java.util.Map;
+
+/**
+ * This class represents the UI for the Start Screen of the game.
+ */
+public class EndScreenUi extends ScreenUi {
+  private final HustleGame game;
+  private final Stage stage;
+  private final Skin skin;
+  private Label nameLabel;
+  private Table table;
+  private Label cursorLabel;
+<span class="nc" id="L26">  private float timer = 0;</span>
+
+  /**
+   * Constructs a new instance of the EndScreenUi class.
+   *
+   * @param game The game instance that this UI is associated with.
+   */
+<span class="nc" id="L33">  public EndScreenUi(HustleGame game) {</span>
+
+<span class="nc" id="L35">    this.game = game;</span>
+<span class="nc" id="L36">    stage = new Stage(new ScreenViewport());</span>
+<span class="nc" id="L37">    skin = new Skin(Gdx.files.internal(&quot;Pixthulhu_UI_Skin/pixthulhuui/pixthulhu-ui.json&quot;));</span>
+<span class="nc" id="L38">    setupUi();</span>
+<span class="nc" id="L39">  }</span>
+
+  private void setupUi() {
+<span class="nc" id="L42">    table = new Table();</span>
+<span class="nc" id="L43">    table.setFillParent(true);</span>
+<span class="nc" id="L44">    stage.addActor(table);</span>
+
+    // Thank you label
+<span class="nc" id="L47">    Label thanksLabel = new Label(&quot;Thank you for playing Heslington Hustle&quot;, skin);</span>
+<span class="nc" id="L48">    thanksLabel.setAlignment(Align.center);</span>
+<span class="nc" id="L49">    table.add(thanksLabel).center().padBottom(60);</span>
+<span class="nc" id="L50">    table.row();</span>
+
+    // Score labels, detailed per day
+<span class="nc" id="L53">    updateScoreLabels(table);</span>
+
+    // Achievement labels
+<span class="nc" id="L56">    addAchievementLabels(table);</span>
+<span class="nc" id="L57">  }</span>
+
+  public void updateNameLabel() {
+<span class="nc" id="L60">    nameLabel.setText(&quot;Enter name: &quot; + game.getGameState().getName());</span>
+<span class="nc" id="L61">    table.invalidate(); // Forces the table to re-layout its children</span>
+<span class="nc" id="L62">  }</span>
+
+  private void updateScoreLabels(Table table) {
+
+<span class="nc" id="L66">    table.row();</span>
+<span class="nc" id="L67">    Label dailyAverageLabel = new Label(&quot;On average per day you:&quot;, skin);</span>
+<span class="nc" id="L68">    dailyAverageLabel.setAlignment(Align.center);</span>
+<span class="nc" id="L69">    table.add(dailyAverageLabel).center();</span>
+
+<span class="nc" id="L71">    Map&lt;String, Integer&gt; activitiesCount = game.getGameState().getActivityCount();</span>
+
+<span class="nc" id="L73">    table.row();</span>
+<span class="nc" id="L74">    int studyCount = activitiesCount.get(&quot;Study&quot;);</span>
+<span class="nc" id="L75">    int studyAverage = Math.round(studyCount / 7f);</span>
+<span class="nc" id="L76">    Label studiedLabel = new Label(String.format(&quot;Studied %d times&quot;, studyAverage), skin);</span>
+<span class="nc" id="L77">    studiedLabel.setAlignment(Align.center);</span>
+<span class="nc" id="L78">    table.add(studiedLabel).center();</span>
+
+<span class="nc" id="L80">    table.row();</span>
+<span class="nc" id="L81">    int eatCount = activitiesCount.get(&quot;Eat&quot;);</span>
+<span class="nc" id="L82">    int eatAverage = Math.round(eatCount / 7f);</span>
+<span class="nc" id="L83">    Label ateLabel = new Label(String.format(&quot;Ate: %d times&quot;, eatAverage), skin);</span>
+<span class="nc" id="L84">    ateLabel.setAlignment(Align.center);</span>
+<span class="nc" id="L85">    table.add(ateLabel).center();</span>
+
+<span class="nc" id="L87">    table.row();</span>
+<span class="nc" id="L88">    int recreationCount = activitiesCount.get(&quot;Recreation&quot;);</span>
+<span class="nc" id="L89">    int recreationAverage = Math.round(recreationCount / 7f);</span>
+<span class="nc" id="L90">    Label relaxedLabel = new Label(String.format(&quot;Relaxed: %d times&quot;, recreationAverage), skin);</span>
+<span class="nc" id="L91">    relaxedLabel.setAlignment(Align.center);</span>
+<span class="nc" id="L92">    table.add(relaxedLabel).center().padBottom(60);</span>
+
+<span class="nc" id="L94">    table.row();</span>
+<span class="nc" id="L95">    int finalScore = game.getGameState().getScore();</span>
+<span class="nc" id="L96">    Label scoreLabel = new Label(String.format(&quot;Score: %d / 100&quot;, finalScore), skin);</span>
+<span class="nc" id="L97">    scoreLabel.setAlignment(Align.center);</span>
+<span class="nc" id="L98">    table.add(scoreLabel).center().padBottom(60);</span>
+<span class="nc" id="L99">  }</span>
+
+  private void addAchievementLabels(Table table) {
+<span class="nc" id="L102">    Map&lt;String, Integer&gt; activitiesCount = game.getGameState().getActivityCount();</span>
+<span class="nc" id="L103">    int defaultEatCount = activitiesCount.getOrDefault(&quot;Eat&quot;, 0);</span>
+<span class="nc" id="L104">    int eatThreshold = ScoreManager.getEatThreshold();</span>
+<span class="nc" id="L105">    addLabelIfThresholdExceeded(table, &quot;Eat&quot;, defaultEatCount, eatThreshold);</span>
+
+<span class="nc" id="L107">    int defaultStudyCount = activitiesCount.getOrDefault(&quot;Study&quot;, 0);</span>
+<span class="nc" id="L108">    int studyThreshold = ScoreManager.getStudyThreshold();</span>
+<span class="nc" id="L109">    addLabelIfThresholdExceeded(table, &quot;Study&quot;, defaultStudyCount, studyThreshold);</span>
+
+<span class="nc" id="L111">    int defaultRecreationCount = activitiesCount.getOrDefault(&quot;Recreation&quot;, 0);</span>
+<span class="nc" id="L112">    int recreationThreshold = ScoreManager.getRecThreshold();</span>
+<span class="nc" id="L113">    addLabelIfThresholdExceeded(table, &quot;Relax&quot;, defaultRecreationCount, recreationThreshold);</span>
+
+
+<span class="nc bnc" id="L116" title="All 2 branches missed.">    if (ScoreManager.isPenaltyApplied()) {</span>
+<span class="nc" id="L117">      table.row();</span>
+<span class="nc" id="L118">      Label penaltyLabel = new Label(</span>
+          &quot;A score penalty was applied. Make sure to eat, study and relax every day!&quot;, skin
+          );
+<span class="nc" id="L121">      penaltyLabel.setAlignment(Align.center);</span>
+<span class="nc" id="L122">      table.add(penaltyLabel).center().padTop(60);</span>
+    }
+
+    // Name label
+<span class="nc" id="L126">    table.row();</span>
+<span class="nc" id="L127">    nameLabel = new Label(&quot;Enter name: &quot; + game.getGameState().getName(), skin);</span>
+<span class="nc" id="L128">    nameLabel.setAlignment(Align.center);</span>
+
+<span class="nc" id="L130">    cursorLabel = new Label(&quot;|&quot;, skin);</span>
+<span class="nc" id="L131">    cursorLabel.setAlignment(Align.left);</span>
+
+<span class="nc" id="L133">    table.row();</span>
+<span class="nc" id="L134">    Table nameTable = new Table();</span>
+<span class="nc" id="L135">    nameTable.add(nameLabel).left();</span>
+<span class="nc" id="L136">    nameTable.add(cursorLabel).width(10).left();</span>
+
+<span class="nc" id="L138">    cursorLabel.setColor(1, 1, 1, 0);</span>
+<span class="nc" id="L139">    table.add(nameTable).center().padTop(60);</span>
+<span class="nc" id="L140">  }</span>
+
+  private void addLabelIfThresholdExceeded(Table table, String activity, int count, int threshold) {
+<span class="nc" id="L143">    table.row();</span>
+<span class="nc bnc" id="L144" title="All 2 branches missed.">    if (count &gt; threshold) {</span>
+<span class="nc" id="L145">      Label label = new Label(String.format(</span>
+<span class="nc" id="L146">          &quot;ACHIEVEMENT: %s more than %d times +10 points&quot;, activity, threshold), skin</span>
+          );
+<span class="nc" id="L148">      label.setAlignment(Align.center);</span>
+<span class="nc" id="L149">      table.add(label).center();</span>
+<span class="nc" id="L150">      table.row();</span>
+    }
+<span class="nc" id="L152">  }</span>
+
+  @Override
+  public void update() {
+
+<span class="nc" id="L157">    ScreenUtils.clear(0, 0, 0, 255);</span>
+<span class="nc" id="L158">    stage.act(Gdx.graphics.getDeltaTime());</span>
+<span class="nc" id="L159">    stage.draw();</span>
+
+<span class="nc" id="L161">    float delta = Gdx.graphics.getDeltaTime();</span>
+
+<span class="nc" id="L163">    timer += delta;</span>
+<span class="nc" id="L164">    float blinkTime = 0.5f;</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">    if (timer &gt;= blinkTime) {</span>
+<span class="nc" id="L166">      cursorLabel.setColor(</span>
+<span class="nc" id="L167">          cursorLabel.getColor().r,</span>
+<span class="nc" id="L168">          cursorLabel.getColor().g,</span>
+<span class="nc" id="L169">          cursorLabel.getColor().b,</span>
+<span class="nc" id="L170">          1 - cursorLabel.getColor().a);</span>
+<span class="nc" id="L171">      timer = 0;</span>
+    }
+<span class="nc" id="L173">  }</span>
+
+  @Override
+  public void resize(int width, int height) {
+<span class="nc" id="L177">    stage.getViewport().update(width, height, true);</span>
+<span class="nc" id="L178">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

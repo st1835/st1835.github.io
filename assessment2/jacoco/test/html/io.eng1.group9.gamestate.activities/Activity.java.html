@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Activity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">io.eng1.group9.gamestate.activities</a> &gt; <span class="el_source">Activity.java</span></div><h1>Activity.java</h1><pre class="source lang-java linenums">package io.eng1.group9.gamestate.activities;
+
+/**
+ * Base class for the activity types.
+ */
+public abstract class Activity {
+
+  private final int timeConsumption;
+  private final int energyConsumption;
+  private final String name;
+
+  /**
+   * Instantiates a new Activity.
+   *
+   * @param time   How much time the activity takes
+   * @param energy How much energy the activity takes
+   * @param name   Name of the activity
+   */
+<span class="fc" id="L19">  public Activity(int time, int energy, String name) {</span>
+<span class="fc" id="L20">    this.timeConsumption = time;</span>
+<span class="fc" id="L21">    this.energyConsumption = energy;</span>
+<span class="fc" id="L22">    this.name = name;</span>
+<span class="fc" id="L23">  }</span>
+
+  /**
+   * Returns how much time the activity takes.
+   *
+   * @return the time consumption
+   */
+  public int getTimeConsumption() {
+<span class="fc" id="L31">    return timeConsumption;</span>
+  }
+
+  /**
+   * Returns how much energy the activity takes.
+   *
+   * @return the energy consumption
+   */
+  public int getEnergyConsumption() {
+<span class="fc" id="L40">    return energyConsumption;</span>
+  }
+
+  @Override
+  public String toString() {
+<span class="nc" id="L45">    return String.format(&quot;%1s, %2d time, %3d energy&quot;, name, getTimeConsumption(),</span>
+<span class="nc" id="L46">        getEnergyConsumption());</span>
+  }
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

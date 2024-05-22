@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>StartScreenUi.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">io.eng1.group9.startscreen</a> &gt; <span class="el_source">StartScreenUi.java</span></div><h1>StartScreenUi.java</h1><pre class="source lang-java linenums">package io.eng1.group9.startscreen;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import io.eng1.group9.ScreenUi;
+
+/**
+ * This class represents the UI for the Start Screen of the game.
+ */
+public class StartScreenUi extends ScreenUi {
+  private final ScreenViewport screenViewport;
+  private final Stage stage;
+  private final Skin skin;
+
+  /**
+   * This class represents the UI for the Start Screen of the game.
+   */
+<span class="nc" id="L28">  public StartScreenUi() {</span>
+<span class="nc" id="L29">    screenViewport = new ScreenViewport();</span>
+<span class="nc" id="L30">    stage = new Stage(screenViewport);</span>
+<span class="nc" id="L31">    skin = new Skin(Gdx.files.internal(&quot;Pixthulhu_UI_Skin/pixthulhuui/pixthulhu-ui.json&quot;));</span>
+
+<span class="nc" id="L33">    setupUi();</span>
+<span class="nc" id="L34">  }</span>
+
+  private void setupUi() {
+<span class="nc" id="L37">    Table table = new Table();</span>
+<span class="nc" id="L38">    table.setFillParent(true); // The table will size itself to the stage</span>
+<span class="nc" id="L39">    stage.addActor(table);</span>
+
+    // Title label
+<span class="nc" id="L42">    Label titleLabel = new Label(&quot;HESLINGTON HUSTLE&quot;, skin, &quot;title&quot;);</span>
+<span class="nc" id="L43">    table.add(titleLabel).padBottom(20).row();</span>
+
+    // Instruction label
+<span class="nc" id="L46">    Label instructionLabel = new Label(&quot;INSTRUCTIONS: You need to study for an upcoming exam.\n&quot;</span>
+            + &quot;You need to manage time so you also eat,\n&quot;
+            + &quot;sleep and relax while getting ready for the exam.\n&quot;
+            + &quot;WASD / Arrow keys move the player\n&quot;
+            + &quot;Enter performs the activity\n\n\n\n\n&quot;
+            + &quot;PRESS ENTER TO PLAY&quot;, skin, &quot;default&quot;);
+<span class="nc" id="L52">    instructionLabel.setAlignment(Align.center);</span>
+<span class="nc" id="L53">    table.add(instructionLabel).padBottom(20).row();</span>
+
+    // Licence label
+<span class="nc" id="L56">    FreeTypeFontGenerator generator = new FreeTypeFontGenerator(</span>
+<span class="nc" id="L57">            Gdx.files.internal(&quot;Yantramanav/Yantramanav-Regular.ttf&quot;)</span>
+            );
+<span class="nc" id="L59">    FreeTypeFontParameter parameter = new FreeTypeFontParameter();</span>
+<span class="nc" id="L60">    parameter.size = 15;</span>
+<span class="nc" id="L61">    BitmapFont licenceFont = generator.generateFont(parameter);</span>
+<span class="nc" id="L62">    generator.dispose();</span>
+
+<span class="nc" id="L64">    Label.LabelStyle licenceStyle = new Label.LabelStyle(licenceFont, Color.WHITE);</span>
+<span class="nc" id="L65">    Label licenceLabel = new Label(</span>
+        &quot;To view licences used: visit https://eng1-group-9-2024.github.io/Heslington-Hustle-Info/&quot;, licenceStyle
+             );
+<span class="nc" id="L68">    table.add(licenceLabel).padTop(10).row();</span>
+<span class="nc" id="L69">  }</span>
+
+  @Override
+  public void update() {
+<span class="nc" id="L73">    ScreenUtils.clear(0, 0, 0, 1);</span>
+<span class="nc" id="L74">    screenViewport.apply();</span>
+<span class="nc" id="L75">    stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));</span>
+<span class="nc" id="L76">    stage.draw();</span>
+<span class="nc" id="L77">  }</span>
+
+  @Override
+  public void resize(int width, int height) {
+<span class="nc" id="L81">    screenViewport.update(width, height, true);</span>
+<span class="nc" id="L82">    stage.getViewport().update(width, height, true);</span>
+<span class="nc" id="L83">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

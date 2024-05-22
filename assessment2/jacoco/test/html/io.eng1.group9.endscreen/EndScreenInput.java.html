@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EndScreenInput.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">io.eng1.group9.endscreen</a> &gt; <span class="el_source">EndScreenInput.java</span></div><h1>EndScreenInput.java</h1><pre class="source lang-java linenums">package io.eng1.group9.endscreen;
+
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
+import io.eng1.group9.HustleGame;
+import io.eng1.group9.scoring.ScoreManager;
+
+/**
+ * Input handler for EndScreen.
+ */
+class EndScreenInput extends InputAdapter {
+  /**
+   * The Game.
+   */
+  HustleGame game;
+<span class="nc" id="L16">  private final StringBuilder nameBuffer = new StringBuilder();</span>
+
+  /**
+   * Instantiates a new End screen input.
+   *
+   * @param game HustleGame object that controls the application
+   */
+<span class="nc" id="L23">  public EndScreenInput(HustleGame game) {</span>
+<span class="nc" id="L24">    this.game = game;</span>
+<span class="nc" id="L25">  }</span>
+
+  /**
+   * Handle user keyboard input.
+   *
+   * @param keycode the key pressed
+   * @return true if handled, false otherwise
+   */
+  @Override
+  public boolean keyDown(int keycode) {
+<span class="nc bnc" id="L35" title="All 3 branches missed.">    switch (keycode) {</span>
+      case Input.Keys.BACKSPACE:
+<span class="nc bnc" id="L37" title="All 2 branches missed.">        if (nameBuffer.length() &gt; 0) {</span>
+<span class="nc" id="L38">          nameBuffer.deleteCharAt(nameBuffer.length() - 1); // Remove the last character</span>
+<span class="nc" id="L39">          updateName();</span>
+        }
+<span class="nc" id="L41">        return true;</span>
+      case Input.Keys.ENTER:
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        if (nameBuffer.length() &gt; 0) {</span>
+<span class="nc" id="L44">          int score = game.getGameState().getScore();</span>
+<span class="nc" id="L45">          ScoreManager.addScore(nameBuffer.toString(), score);</span>
+<span class="nc" id="L46">          game.setScoreScreen();</span>
+        }
+<span class="nc" id="L48">        return true;</span>
+      default:
+<span class="nc" id="L50">        return false;</span>
+    }
+  }
+
+
+  /**
+   * Handle user keyboard input when characters are typed.
+   *
+   * @param character the character typed
+   * @return true if handled, false otherwise
+   */
+  @Override
+  public boolean keyTyped(char character) {
+<span class="nc bnc" id="L63" title="All 6 branches missed.">    if ((Character.isLetterOrDigit(character) || character == ' ') &amp;&amp; nameBuffer.length() &lt; 30) {</span>
+<span class="nc" id="L64">      nameBuffer.append(character);</span>
+<span class="nc" id="L65">      updateName();</span>
+<span class="nc" id="L66">      return true;</span>
+    }
+<span class="nc" id="L68">    return false;</span>
+  }
+
+  /**h
+   * Sets name in gamestate.
+   *
+   */
+  public void updateName() {
+<span class="nc" id="L76">    game.getGameState().setName(nameBuffer.toString());</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">    if (game.getEndScreen() != null) {</span>
+<span class="nc" id="L78">      EndScreenUi endScreenUi = game.getEndScreen().getEndScreenUi();</span>
+<span class="nc" id="L79">      endScreenUi.updateNameLabel();</span>
+    }
+<span class="nc" id="L81">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

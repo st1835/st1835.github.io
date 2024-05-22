@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameScreenInput.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">io.eng1.group9.gamescreen</a> &gt; <span class="el_source">GameScreenInput.java</span></div><h1>GameScreenInput.java</h1><pre class="source lang-java linenums">package io.eng1.group9.gamescreen;
+
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
+import io.eng1.group9.HustleGame;
+import io.eng1.group9.gamestate.Direction;
+import io.eng1.group9.gamestate.activities.Activity;
+import java.util.ArrayList;
+
+/**
+ * Input handler for GameScreen.
+ */
+public class GameScreenInput extends InputAdapter {
+
+  private final HustleGame game;
+<span class="nc" id="L16">  private boolean upPressed = false;</span>
+<span class="nc" id="L17">  private boolean downPressed = false;</span>
+<span class="nc" id="L18">  private boolean leftPressed = false;</span>
+<span class="nc" id="L19">  private boolean rightPressed = false;</span>
+<span class="nc" id="L20">  private final float moveCooldown = 0.2f;</span>
+<span class="nc" id="L21">  private float moveTimer = moveCooldown;</span>
+
+
+  /**
+   * Instantiates a new Game screen input.
+   *
+   * @param game HustleGame object that controls the application
+   */
+<span class="nc" id="L29">  public GameScreenInput(HustleGame game) {</span>
+<span class="nc" id="L30">    this.game = game;</span>
+<span class="nc" id="L31">  }</span>
+
+  /**
+   * Handle user keyboard input.
+   *
+   * @param keycode the key pressed
+   * @return true if handled, false otherwise
+   */
+
+  @Override
+  public boolean keyDown(int keycode) {
+<span class="nc bnc" id="L42" title="All 7 branches missed.">    switch (keycode) {</span>
+      case Input.Keys.W:
+      case Input.Keys.UP:
+<span class="nc" id="L45">        upPressed = true;</span>
+<span class="nc" id="L46">        break;</span>
+      case Input.Keys.A:
+      case Input.Keys.LEFT:
+<span class="nc" id="L49">        leftPressed = true;</span>
+<span class="nc" id="L50">        break;</span>
+      case Input.Keys.S:
+      case Input.Keys.DOWN:
+<span class="nc" id="L53">        downPressed = true;</span>
+<span class="nc" id="L54">        break;</span>
+      case Input.Keys.D:
+      case Input.Keys.RIGHT:
+<span class="nc" id="L57">        rightPressed = true;</span>
+<span class="nc" id="L58">        break;</span>
+      case Input.Keys.ENTER:
+<span class="nc" id="L60">        performGameActivity();</span>
+<span class="nc" id="L61">        break;</span>
+      case Input.Keys.ESCAPE:
+<span class="nc" id="L63">        game.restartGame();</span>
+<span class="nc" id="L64">        break;</span>
+      default:
+<span class="nc" id="L66">        return false;</span>
+    }
+<span class="nc" id="L68">    return true;</span>
+  }
+
+  @Override
+  public boolean keyUp(int keycode) {
+<span class="nc bnc" id="L73" title="All 5 branches missed.">    switch (keycode) {</span>
+      case Input.Keys.W:
+      case Input.Keys.UP:
+<span class="nc" id="L76">        upPressed = false;</span>
+<span class="nc" id="L77">        break;</span>
+      case Input.Keys.A:
+      case Input.Keys.LEFT:
+<span class="nc" id="L80">        leftPressed = false;</span>
+<span class="nc" id="L81">        break;</span>
+      case Input.Keys.S:
+      case Input.Keys.DOWN:
+<span class="nc" id="L84">        downPressed = false;</span>
+<span class="nc" id="L85">        break;</span>
+      case Input.Keys.D:
+      case Input.Keys.RIGHT:
+<span class="nc" id="L88">        rightPressed = false;</span>
+<span class="nc" id="L89">        break;</span>
+      default:
+<span class="nc" id="L91">        return false;</span>
+    }
+<span class="nc" id="L93">    return true;</span>
+  }
+
+  /**
+   * Updates the input state and attempts to move the player based on the current input.
+   *
+   * @param delta The time in seconds since the last update.
+   */
+  public void update(float delta) {
+<span class="nc" id="L102">    moveTimer += delta;</span>
+
+<span class="nc bnc" id="L104" title="All 2 branches missed.">    if (moveTimer &gt;= moveCooldown) {</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">      if (upPressed) {</span>
+<span class="nc" id="L106">        moveUp();</span>
+<span class="nc" id="L107">        moveTimer = 0;</span>
+      }
+<span class="nc bnc" id="L109" title="All 2 branches missed.">      if (downPressed) {</span>
+<span class="nc" id="L110">        moveDown();</span>
+<span class="nc" id="L111">        moveTimer = 0;</span>
+      }
+<span class="nc bnc" id="L113" title="All 2 branches missed.">      if (leftPressed) {</span>
+<span class="nc" id="L114">        moveLeft();</span>
+<span class="nc" id="L115">        moveTimer = 0;</span>
+      }
+<span class="nc bnc" id="L117" title="All 2 branches missed.">      if (rightPressed) {</span>
+<span class="nc" id="L118">        moveRight();</span>
+<span class="nc" id="L119">        moveTimer = 0;</span>
+      }
+    }
+<span class="nc" id="L122">  }</span>
+
+
+  /**
+   * Attempt to move the player up.
+   *
+   */
+  public void moveUp() {
+<span class="nc" id="L130">    game.getGameState().move(Direction.UP);</span>
+<span class="nc" id="L131">  }</span>
+
+  /**
+   * Attempt to move the player left.
+   *
+   */
+  public void moveLeft() {
+<span class="nc" id="L138">    game.getGameState().move(Direction.LEFT);</span>
+<span class="nc" id="L139">  }</span>
+
+  /**
+   * Attempt to move the player down.
+   *
+   */
+  public void moveDown() {
+<span class="nc" id="L146">    game.getGameState().move(Direction.DOWN);</span>
+<span class="nc" id="L147">  }</span>
+
+  /**
+   * Attempt to move the player right.
+   */
+  public void moveRight() {
+<span class="nc" id="L153">    game.getGameState().move(Direction.RIGHT);</span>
+<span class="nc" id="L154">  }</span>
+
+  /**
+   * Attempt to move perform an activity.
+   */
+  public void performGameActivity() {
+<span class="nc" id="L160">    ArrayList&lt;Activity&gt; tempList = game.getGameState().getActivities();</span>
+<span class="nc bnc" id="L161" title="All 2 branches missed.">    if (!tempList.isEmpty()) {</span>
+<span class="nc" id="L162">      game.getGameState().performActivity(tempList.get(0));</span>
+<span class="nc bnc" id="L163" title="All 2 branches missed.">      if (game.getGameState().isGameOver()) {</span>
+<span class="nc" id="L164">        nextScreen();</span>
+      }
+    }
+<span class="nc" id="L167">  }</span>
+
+  /**
+   * Change to the end screen.
+   */
+  private void nextScreen() {
+<span class="nc" id="L173">    game.getGameState().saveScore();</span>
+<span class="nc" id="L174">    game.setEndScreen();</span>
+<span class="nc" id="L175">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

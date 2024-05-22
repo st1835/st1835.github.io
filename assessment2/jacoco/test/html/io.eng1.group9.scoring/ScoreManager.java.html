@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ScoreManager.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">io.eng1.group9.scoring</a> &gt; <span class="el_source">ScoreManager.java</span></div><h1>ScoreManager.java</h1><pre class="source lang-java linenums">package io.eng1.group9.scoring;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
+import io.eng1.group9.gamestate.Day;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * A class for managing and saving high scores.
+ */
+<span class="nc" id="L14">public class ScoreManager {</span>
+
+  /**
+   * The key for the preferences file containing the high scores.
+   */
+  private static final String PREFERENCES_KEY = &quot;high_scores&quot;;
+
+  /**
+   * The preferences object used to save and load high scores.
+   */
+<span class="fc" id="L24">  private static final Preferences preferences = Gdx.app.getPreferences(PREFERENCES_KEY);</span>
+  private static final int studyCountBonusThreshold = 10;
+
+  private static final int recCountBonusThreshold = 10;
+  private static final int eatCountBonusThreshold = 21;
+<span class="fc" id="L29">  private static boolean penaltyApplied = false;</span>
+
+  /**
+   * Calculate the score.
+   *
+   * @return The score calculated.
+   */
+  public static int calculateScore(List&lt;Day&gt; week) {
+<span class="fc" id="L37">    int studyCount = 0;</span>
+<span class="fc" id="L38">    int dayStudiedOnce = 0;</span>
+<span class="fc" id="L39">    int dayRelaxedOnce = 0;</span>
+<span class="fc" id="L40">    int dayEatenCount = 0;</span>
+<span class="fc" id="L41">    int maxScore = 100;</span>
+
+<span class="fc bfc" id="L43" title="All 2 branches covered.">    for (Day day : week) {</span>
+<span class="fc" id="L44">      studyCount += day.getNumberOfActivity(&quot;Study&quot;);</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">      if (day.getNumberOfActivity(&quot;Study&quot;) &gt;= 1) {</span>
+<span class="fc" id="L46">        dayStudiedOnce++;</span>
+      }
+<span class="fc bfc" id="L48" title="All 2 branches covered.">      if (day.getNumberOfActivity(&quot;Eat&quot;) &gt;= 2) {</span>
+<span class="fc" id="L49">        dayEatenCount++;</span>
+      }
+<span class="pc bpc" id="L51" title="1 of 2 branches missed.">      if (day.getNumberOfActivity(&quot;Recreation&quot;) &gt; 2) {</span>
+<span class="nc" id="L52">        dayRelaxedOnce++;</span>
+      }
+<span class="fc" id="L54">    }</span>
+
+<span class="fc" id="L56">    int score = studyCount * 10;</span>
+<span class="fc" id="L57">    score = Math.min(score, maxScore);</span>
+
+    // Apply penalties
+<span class="fc bfc" id="L60" title="All 2 branches covered.">    if (dayStudiedOnce != 7) {</span>
+<span class="fc" id="L61">      score = dayStudiedOnce * 10;</span>
+<span class="fc" id="L62">      score = Math.min(score, 50);</span>
+<span class="fc" id="L63">      penaltyApplied = true;</span>
+    }
+
+<span class="fc bfc" id="L66" title="All 4 branches covered.">    if (dayStudiedOnce == 6 &amp;&amp; studyCount &gt;= 7) {</span>
+<span class="fc" id="L67">      score = 70;</span>
+    }
+
+<span class="fc bfc" id="L70" title="All 2 branches covered.">    if (dayEatenCount &lt; 7) {</span>
+<span class="fc" id="L71">      score -= 10; // Penalty for not eating enough</span>
+<span class="fc" id="L72">      penaltyApplied = true;</span>
+    }
+
+<span class="pc bpc" id="L75" title="1 of 2 branches missed.">    if (dayRelaxedOnce &lt; 7) {</span>
+<span class="fc" id="L76">      score -= 10; // Penalty for not relaxing enough</span>
+<span class="fc" id="L77">      penaltyApplied = true;</span>
+    }
+
+<span class="fc" id="L80">    Map&lt;String, Integer&gt; activities = scoreCount(week);</span>
+<span class="fc" id="L81">    int eatCount = activities.get(&quot;Eat&quot;);</span>
+<span class="fc" id="L82">    int recreationCount = activities.get(&quot;Recreation&quot;);</span>
+
+    // Add achievement bonuses
+<span class="fc bfc" id="L85" title="All 2 branches covered.">    if (recreationCount &gt; recCountBonusThreshold) {</span>
+<span class="fc" id="L86">      score += 10;</span>
+    }
+
+<span class="fc bfc" id="L89" title="All 2 branches covered.">    if (eatCount &gt;= eatCountBonusThreshold) {</span>
+<span class="fc" id="L90">      score += 10;</span>
+    }
+
+<span class="fc bfc" id="L93" title="All 2 branches covered.">    if (studyCount &gt; studyCountBonusThreshold) {</span>
+<span class="fc" id="L94">      score += 10;</span>
+    }
+
+
+<span class="fc" id="L98">    score = Math.max(score, 0);</span>
+<span class="fc" id="L99">    score = Math.min(score, 100);</span>
+<span class="fc" id="L100">    return score;</span>
+  }
+
+  public static boolean isPenaltyApplied() {
+<span class="nc" id="L104">    return penaltyApplied;</span>
+  }
+
+  /**
+   * Calculate the score.
+   * &lt;p&gt;
+   * Currently, this just counts how many times each activity has taken place
+   * &lt;/p&gt;
+   *
+   * @return A mapping specifying how many times each type of activity has been performed
+   */
+  public static Map&lt;String, Integer&gt; scoreCount(List&lt;Day&gt; week) {
+<span class="fc" id="L116">    int sleepCounter = 0;</span>
+<span class="fc" id="L117">    int eatCounter = 0;</span>
+<span class="fc" id="L118">    int studyCounter = 0;</span>
+<span class="fc" id="L119">    int recreationalCounter = 0;</span>
+<span class="fc" id="L120">    Map&lt;String, Integer&gt; activitiesCounter = new HashMap&lt;&gt;();</span>
+<span class="fc bfc" id="L121" title="All 2 branches covered.">    for (Day day : week) {</span>
+      //goes through the array list one activity at a time and increments the corresponding counter
+<span class="fc" id="L123">      sleepCounter += day.getNumberOfActivity(&quot;Sleep&quot;);</span>
+<span class="fc" id="L124">      eatCounter += day.getNumberOfActivity(&quot;Eat&quot;);</span>
+<span class="fc" id="L125">      studyCounter += day.getNumberOfActivity(&quot;Study&quot;);</span>
+<span class="fc" id="L126">      recreationalCounter += day.getNumberOfActivity(&quot;Recreation&quot;);</span>
+<span class="fc" id="L127">    }</span>
+
+    //adds the final counts to the arraylist and returns it
+<span class="fc" id="L130">    activitiesCounter.put(&quot;Sleep&quot;, sleepCounter);</span>
+<span class="fc" id="L131">    activitiesCounter.put(&quot;Eat&quot;, eatCounter);</span>
+<span class="fc" id="L132">    activitiesCounter.put(&quot;Study&quot;, studyCounter);</span>
+<span class="fc" id="L133">    activitiesCounter.put(&quot;Recreation&quot;, recreationalCounter);</span>
+
+<span class="fc" id="L135">    return activitiesCounter;</span>
+  }
+
+
+  /**
+   * Saves a new score along with the player's name.
+   * If the list of scores already contains 10 scores,
+   * the lowest score will be removed to make room for the new score.
+   *
+   * @param name  The name of the player who achieved the score.
+   * @param score The score achieved by the player.
+   */
+  public static void addScore(String name, int score) {
+<span class="fc" id="L148">    List&lt;PlayerScore&gt; scores = getScores();</span>
+<span class="fc" id="L149">    scores.add(new PlayerScore(name, score));</span>
+    // Sort scores descending
+<span class="fc" id="L151">    scores.sort((p1, p2) -&gt; Integer.compare(p2.score, p1.score));</span>
+    // Keep only the top 10 scores
+<span class="fc bfc" id="L153" title="All 2 branches covered.">    if (scores.size() &gt; 10) {</span>
+<span class="fc" id="L154">      scores = new ArrayList&lt;&gt;(scores.subList(0, 10));</span>
+    }
+    // Save updated scores
+<span class="fc" id="L157">    saveScores(scores);</span>
+<span class="fc" id="L158">  }</span>
+
+  /**
+   * Saves the list of scores to the preferences file.
+   *
+   * @param scores The list of scores to be saved.
+   */
+  private static void saveScores(List&lt;PlayerScore&gt; scores) {
+    // Convert scores to a single string
+<span class="fc" id="L167">    StringBuilder sb = new StringBuilder();</span>
+<span class="fc bfc" id="L168" title="All 2 branches covered.">    for (PlayerScore score : scores) {</span>
+<span class="fc" id="L169">      sb.append(score.name).append(&quot;:&quot;).append(score.score).append(&quot;;&quot;);</span>
+<span class="fc" id="L170">    }</span>
+<span class="fc" id="L171">    preferences.putString(&quot;scoreList&quot;, sb.toString());</span>
+<span class="fc" id="L172">    preferences.flush();</span>
+<span class="fc" id="L173">  }</span>
+
+  /**
+   * Retrieves the list of high scores from the preferences file.
+   *
+   * @return The list of high scores.
+   */
+  public static List&lt;ScoreManager.PlayerScore&gt; getScores() {
+<span class="fc" id="L181">    List&lt;ScoreManager.PlayerScore&gt; scores = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L182">    String scoresStr = preferences.getString(&quot;scoreList&quot;, &quot;&quot;);</span>
+<span class="fc bfc" id="L183" title="All 2 branches covered.">    if (!scoresStr.isEmpty()) {</span>
+<span class="fc bfc" id="L184" title="All 2 branches covered.">      for (String entry : scoresStr.split(&quot;;&quot;)) {</span>
+<span class="fc" id="L185">        String[] parts = entry.split(&quot;:&quot;);</span>
+<span class="pc bpc" id="L186" title="1 of 2 branches missed.">        if (parts.length == 2) {</span>
+<span class="fc" id="L187">          scores.add(new PlayerScore(parts[0], Integer.parseInt(parts[1])));</span>
+        }
+      }
+    }
+<span class="fc" id="L191">    return scores;</span>
+  }
+
+  /**
+   * Clears all saved scores from the preferences file.
+   */
+  public static void resetScores() {
+<span class="fc" id="L198">    preferences.putString(&quot;scoreList&quot;, &quot;&quot;); // Clear the score string</span>
+<span class="fc" id="L199">    preferences.flush(); // Make sure the changes are saved to the file</span>
+<span class="fc" id="L200">  }</span>
+
+  public static int getStudyThreshold() {
+<span class="nc" id="L203">    return studyCountBonusThreshold;</span>
+  }
+
+  public static int getEatThreshold() {
+<span class="nc" id="L207">    return eatCountBonusThreshold;</span>
+  }
+
+  public static int getRecThreshold() {
+<span class="nc" id="L211">    return recCountBonusThreshold;</span>
+  }
+
+
+  /**
+   * A class representing a player's score.
+   */
+  public static class PlayerScore {
+    String name;
+    int score;
+
+    /**
+     * Constructs a new instance of the PlayerScore class.
+     *
+     * @param name  The name of the player.
+     * @param score The score achieved by the player.
+     */
+<span class="fc" id="L228">    public PlayerScore(String name, int score) {</span>
+<span class="fc" id="L229">      this.name = name;</span>
+<span class="fc" id="L230">      this.score = score;</span>
+<span class="fc" id="L231">    }</span>
+
+    public String getName() {
+<span class="fc" id="L234">      return name;</span>
+    }
+
+    public int getScore() {
+<span class="fc" id="L238">      return score;</span>
+    }
+
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

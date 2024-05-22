@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameScreenUi.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">io.eng1.group9.gamescreen</a> &gt; <span class="el_source">GameScreenUi.java</span></div><h1>GameScreenUi.java</h1><pre class="source lang-java linenums">package io.eng1.group9.gamescreen;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import io.eng1.group9.HustleGame;
+import io.eng1.group9.ScreenUi;
+import io.eng1.group9.gamestate.activities.Activity;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+
+/**
+ * UI handler for GameScreen.
+ */
+public class GameScreenUi extends ScreenUi {
+
+  private final HustleGame game;
+
+  private final SpriteBatch batch;
+  private final OrthographicCamera camera;
+  private final FillViewport fillViewport;
+  private final ScreenViewport screenViewport;
+<span class="nc" id="L38">  private final float pixelsPerSquare = 120;</span>
+
+  private final Texture playerTexture;
+  private final Texture mapTexture;
+  private final Stage stage;
+  private final Label timeLabel;
+  private final ProgressBar energyBar;
+  private final Label energyLabel;
+  private final Label dayLabel;
+  private final Label scoreLabel;
+  private final Label restartLabel;
+  private final TextButton activityButton;
+  private final List&lt;String&gt; days;
+  private final Vector3 previousPos;
+  // HUD elements
+
+
+  /**
+   * Instantiates a new Game screen ui.
+   *
+   * @param game the game
+   */
+<span class="nc" id="L60">  public GameScreenUi(HustleGame game) {</span>
+<span class="nc" id="L61">    days =</span>
+<span class="nc" id="L62">        Arrays.asList(&quot;Monday&quot;, &quot;Tuesday&quot;, &quot;Wednesday&quot;, &quot;Thursday&quot;, &quot;Friday&quot;, &quot;Saturday&quot;, &quot;Sunday&quot;);</span>
+<span class="nc" id="L63">    previousPos = new Vector3(0, 0, 0);</span>
+<span class="nc" id="L64">    this.game = game;</span>
+<span class="nc" id="L65">    batch = new SpriteBatch();</span>
+<span class="nc" id="L66">    camera = new OrthographicCamera();</span>
+<span class="nc" id="L67">    camera.setToOrtho(false);</span>
+<span class="nc" id="L68">    fillViewport = new FillViewport(16, 9, camera);</span>
+<span class="nc" id="L69">    screenViewport = new ScreenViewport();</span>
+<span class="nc" id="L70">    screenViewport.setScreenX(10);</span>
+<span class="nc" id="L71">    screenViewport.setScreenY(10);</span>
+<span class="nc" id="L72">    playerTexture = new Texture(Gdx.files.internal(&quot;player2.png&quot;));</span>
+<span class="nc" id="L73">    mapTexture = new Texture(Gdx.files.internal(&quot;fullmap.png&quot;));</span>
+
+    // Set up font
+<span class="nc" id="L76">    FreeTypeFontGenerator generator =</span>
+<span class="nc" id="L77">        new FreeTypeFontGenerator(Gdx.files.internal(&quot;Yantramanav/Yantramanav-Regular.ttf&quot;));</span>
+<span class="nc" id="L78">    FreeTypeFontGenerator.FreeTypeFontParameter parameter =</span>
+        new FreeTypeFontGenerator.FreeTypeFontParameter();
+<span class="nc" id="L80">    parameter.size = 24;</span>
+<span class="nc" id="L81">    generator.dispose();</span>
+
+    // Set up HUD
+<span class="nc" id="L84">    stage = new Stage(screenViewport);</span>
+<span class="nc" id="L85">    Skin skin = new Skin(Gdx.files.internal(&quot;Pixthulhu_UI_Skin/pixthulhuui/pixthulhu-ui.json&quot;));</span>
+
+<span class="nc" id="L87">    timeLabel = new Label(&quot;00:00&quot;, skin);</span>
+<span class="nc" id="L88">    dayLabel = new Label(&quot;Monday&quot;, skin);</span>
+<span class="nc" id="L89">    energyBar = new ProgressBar(0, 100, 1, true, skin);</span>
+<span class="nc" id="L90">    energyLabel = new Label(&quot;Energy: 100/100&quot;, skin);</span>
+<span class="nc" id="L91">    scoreLabel = new Label(&quot;&quot;, skin);</span>
+<span class="nc" id="L92">    restartLabel = new Label(&quot;Press Esc to restart and head to main menu&quot;, skin);</span>
+<span class="nc" id="L93">    activityButton = new TextButton(&quot;Perform Activity&quot;, skin);</span>
+<span class="nc" id="L94">    activityButton.setWidth(1000);</span>
+<span class="nc" id="L95">    dayLabel.setFontScale(1.2f);</span>
+<span class="nc" id="L96">    timeLabel.setFontScale(1.2f);</span>
+<span class="nc" id="L97">    timeLabel.setAlignment(Align.right);</span>
+
+<span class="nc" id="L99">    stage.addActor(dayLabel);</span>
+<span class="nc" id="L100">    stage.addActor(timeLabel);</span>
+<span class="nc" id="L101">    stage.addActor(energyBar);</span>
+<span class="nc" id="L102">    stage.addActor(energyLabel);</span>
+<span class="nc" id="L103">    stage.addActor(restartLabel);</span>
+<span class="nc" id="L104">    stage.addActor(activityButton);</span>
+<span class="nc" id="L105">    stage.addActor(scoreLabel);</span>
+<span class="nc" id="L106">  }</span>
+
+
+  @Override
+  public void update() {
+<span class="nc" id="L111">    fillViewport.apply();</span>
+<span class="nc" id="L112">    batch.setProjectionMatrix(camera.combined);</span>
+<span class="nc" id="L113">    showBackground();</span>
+<span class="nc" id="L114">    showMap();</span>
+<span class="nc" id="L115">    showPlayer();</span>
+<span class="nc" id="L116">    showHud();</span>
+<span class="nc" id="L117">  }</span>
+
+  @Override
+  public void resize(int width, int height) {
+<span class="nc" id="L121">    fillViewport.update(width, height);</span>
+<span class="nc" id="L122">    screenViewport.update(width, height, true);</span>
+<span class="nc" id="L123">  }</span>
+
+  /**
+   * Show a coloured background.
+   */
+  private void showBackground() {
+<span class="nc" id="L129">    ScreenUtils.clear(0.133f, 0.133f, 0.133f, 1);</span>
+<span class="nc" id="L130">    camera.update();</span>
+<span class="nc" id="L131">  }</span>
+
+  /**
+   * Draw the map.
+   */
+  private void showMap() {
+<span class="nc" id="L137">    batch.begin();</span>
+<span class="nc" id="L138">    batch.draw(mapTexture, 0, 0, mapTexture.getWidth() / pixelsPerSquare,</span>
+<span class="nc" id="L139">        mapTexture.getHeight() / pixelsPerSquare);</span>
+<span class="nc" id="L140">    batch.end();</span>
+<span class="nc" id="L141">  }</span>
+
+  /**
+   * Draw the player.
+   */
+  private void showPlayer() {
+<span class="nc" id="L147">    batch.begin();</span>
+<span class="nc" id="L148">    float rowOffset = 0.90f;</span>
+<span class="nc" id="L149">    float columnOffset = 0.85f;</span>
+<span class="nc" id="L150">    Vector2 playerPosition = game.getGameState().getPlayerPosition();</span>
+<span class="nc" id="L151">    Vector3 targetPosition =</span>
+        new Vector3(rowOffset + playerPosition.x,
+            columnOffset + playerPosition.y, 0);
+<span class="nc" id="L154">    Vector3 interpolatedPos = previousPos.lerp(targetPosition, 0.1f);</span>
+<span class="nc" id="L155">    batch.draw(playerTexture, interpolatedPos.x, interpolatedPos.y,</span>
+<span class="nc" id="L156">        playerTexture.getWidth() / pixelsPerSquare, playerTexture.getHeight() / pixelsPerSquare);</span>
+<span class="nc" id="L157">    batch.end();</span>
+<span class="nc" id="L158">    camera.position.lerp(targetPosition, 0.1f);</span>
+<span class="nc" id="L159">  }</span>
+
+  /**
+   * Draw the HUD.
+   */
+  private void showHud() {
+<span class="nc" id="L165">    screenViewport.apply();</span>
+
+<span class="nc" id="L167">    final int width = screenViewport.getScreenWidth();</span>
+<span class="nc" id="L168">    final int height = screenViewport.getScreenHeight();</span>
+
+<span class="nc" id="L170">    dayLabel.setX(10);</span>
+<span class="nc" id="L171">    dayLabel.setY(height - dayLabel.getHeight() - 10);</span>
+<span class="nc" id="L172">    dayLabel.setText(days.get(game.getGameState().getDayCount()));</span>
+
+<span class="nc" id="L174">    restartLabel.setX(width / 2f - restartLabel.getWidth() / 2f);</span>
+<span class="nc" id="L175">    restartLabel.setY(height - restartLabel.getHeight() - 10);</span>
+
+<span class="nc" id="L177">    timeLabel.setX(width - timeLabel.getWidth() - 10);</span>
+<span class="nc" id="L178">    timeLabel.setY(height - timeLabel.getHeight() - 10);</span>
+<span class="nc" id="L179">    timeLabel.setText(&quot;Time left: &quot; + game.getGameState().getTime());</span>
+
+
+<span class="nc" id="L182">    final int currentEnergy = game.getGameState().getEnergy();</span>
+<span class="nc" id="L183">    energyLabel.setX(10);</span>
+<span class="nc" id="L184">    energyLabel.setY(10);</span>
+<span class="nc" id="L185">    energyBar.setX(10);</span>
+<span class="nc" id="L186">    energyBar.setY(10 + energyLabel.getHeight() + 10);</span>
+<span class="nc" id="L187">    energyBar.setValue(currentEnergy);</span>
+<span class="nc" id="L188">    energyLabel.setText(currentEnergy + &quot;/100&quot;);</span>
+
+<span class="nc" id="L190">    Map&lt;String, Integer&gt; activityCounts = game.getGameState().getActivityCount();</span>
+<span class="nc" id="L191">    scoreLabel.setText(</span>
+<span class="nc" id="L192">        String.format(&quot;Study: %1d\nEat: %2d\nRecreation: %3d&quot;, activityCounts.get(&quot;Study&quot;),</span>
+<span class="nc" id="L193">            activityCounts.get(&quot;Eat&quot;), activityCounts.get(&quot;Recreation&quot;)));</span>
+<span class="nc" id="L194">    scoreLabel.setX(width - scoreLabel.getWidth() - 10);</span>
+<span class="nc" id="L195">    scoreLabel.setY(height / 2f - scoreLabel.getHeight());</span>
+<span class="nc" id="L196">    scoreLabel.setAlignment(Align.right);</span>
+
+<span class="nc" id="L198">    List&lt;Activity&gt; activities = game.getGameState().getActivities();</span>
+<span class="nc" id="L199">    String currentActivity = &quot;&quot;;</span>
+<span class="nc bnc" id="L200" title="All 2 branches missed.">    if (!activities.isEmpty()) {</span>
+<span class="nc" id="L201">      currentActivity = activities.get(0).toString();</span>
+    }
+<span class="nc" id="L203">    activityButton.setX(width - activityButton.getWidth() - 10);</span>
+<span class="nc" id="L204">    activityButton.setY(10);</span>
+<span class="nc" id="L205">    activityButton.setText(currentActivity);</span>
+
+<span class="nc" id="L207">    stage.draw();</span>
+<span class="nc" id="L208">  }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

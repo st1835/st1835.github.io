@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameState.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">tests</a> &gt; <a href="index.source.html" class="el_package">io.eng1.group9.gamestate</a> &gt; <span class="el_source">GameState.java</span></div><h1>GameState.java</h1><pre class="source lang-java linenums">package io.eng1.group9.gamestate;
+
+import com.badlogic.gdx.math.Vector2;
+import io.eng1.group9.gamestate.activities.Activity;
+import io.eng1.group9.gamestate.activities.Sleep;
+import io.eng1.group9.scoring.ScoreManager;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+
+/**
+ * This class is the main game logic class. The 'game state', i.e. the record of the energy
+ * and time, etc. of the player is kept and modified in this class.
+ */
+public class GameState {
+  private final int maxEnergy; // the energy the player starts with each a day
+  private final int timeInDay; // the total time in each day
+  private final MapGraph map;
+  private final Player character;
+<span class="fc" id="L22">  private final Map&lt;Direction, Vector2&gt; directionOffset =</span>
+<span class="fc" id="L23">      Map.ofEntries(new AbstractMap.SimpleEntry&lt;&gt;(Direction.RIGHT, new Vector2(1, 0)),</span>
+          new AbstractMap.SimpleEntry&lt;&gt;(Direction.LEFT, new Vector2(-1, 0)),
+          new AbstractMap.SimpleEntry&lt;&gt;(Direction.UP, new Vector2(0, 1)),
+          new AbstractMap.SimpleEntry&lt;&gt;(Direction.DOWN, new Vector2(0, -1)));
+<span class="fc" id="L27">  private final List&lt;Day&gt; week = new ArrayList&lt;&gt;(7);</span>
+  private int energy; // remaining energy for the day
+  private int time; // remaining time in the day
+<span class="fc" id="L30">  private Day currentDay = new Day();</span>
+  private Vector2 playerPosition;
+<span class="fc" id="L32">  private boolean gameOver = false;</span>
+<span class="fc" id="L33">  private String playerName = &quot;&quot;;</span>
+<span class="fc" id="L34">  private int score = 0;</span>
+
+
+  /**
+   * Instantiates a new Game state.
+   *
+   * @param energy  how much energy the player has each day
+   * @param time    how much time is in the day
+   * @param player  the player
+   * @param gameMap which map to use
+   */
+<span class="fc" id="L45">  public GameState(int energy, int time, Player player, MapGraph gameMap) {</span>
+<span class="fc" id="L46">    this.energy = energy;</span>
+<span class="fc" id="L47">    this.maxEnergy = energy;</span>
+<span class="fc" id="L48">    this.time = time;</span>
+<span class="fc" id="L49">    this.timeInDay = time;</span>
+<span class="fc" id="L50">    this.character = player;</span>
+<span class="fc" id="L51">    playerPosition = getPlayerPosition();</span>
+<span class="fc" id="L52">    this.map = gameMap;</span>
+
+<span class="fc bfc" id="L54" title="All 2 branches covered.">    if (!map.getFullMap().containsKey(playerPosition)) {</span>
+<span class="fc" id="L55">      sendToSpawnPoint();</span>
+    }
+<span class="fc" id="L57">  }</span>
+
+  /**
+   * Instantiates a new Game state.
+   */
+  public GameState() {
+<span class="nc" id="L63">    this(100, 100, new Player(), new MapGraph(&quot;map&quot;));</span>
+<span class="nc" id="L64">  }</span>
+
+  /**
+   * Instantiates a new Game state.
+   *
+   * @param player  the player
+   * @param gameMap the game map
+   */
+  public GameState(Player player, MapGraph gameMap) {
+<span class="fc" id="L73">    this(100, 100, player, gameMap);</span>
+<span class="fc" id="L74">  }</span>
+
+  private void sendToSpawnPoint() {
+<span class="fc" id="L77">    character.setPosition((Vector2) map.getFullMap().keySet().toArray()[0]);</span>
+<span class="fc" id="L78">    playerPosition = getPlayerPosition();</span>
+<span class="fc" id="L79">  }</span>
+
+  /**
+   * Gets energy.
+   *
+   * @return the energy
+   */
+  public int getEnergy() {
+<span class="fc" id="L87">    return this.energy;</span>
+  }
+
+  /**
+   * Gets time.
+   *
+   * @return the time
+   */
+  public int getTime() {
+<span class="fc" id="L96">    return this.time;</span>
+  }
+
+  /**
+   * Gets day.
+   *
+   * @return the day
+   */
+  public Day getDay() {
+<span class="fc" id="L105">    return currentDay;</span>
+  }
+
+  /**
+   * Gets number of days.
+   *
+   * @return the day number
+   */
+  public int getDayCount() {
+<span class="fc" id="L114">    return week.size();</span>
+  }
+
+
+  /**
+   * Is game over boolean.
+   *
+   * @return the boolean
+   */
+  public boolean isGameOver() {
+<span class="fc" id="L124">    return this.gameOver;</span>
+  }
+
+  /**
+   * Gets player position.
+   *
+   * @return the player position
+   */
+  public Vector2 getPlayerPosition() {
+<span class="fc" id="L133">    return character.getPosition();</span>
+  }
+
+
+  /**
+   * Attempt to move the player.
+   *
+   * @param direction the direction
+   * @return if they moved
+   */
+  public boolean move(Direction direction) {
+<span class="fc bfc" id="L144" title="All 2 branches covered.">    if (canMove(direction)) {</span>
+<span class="fc" id="L145">      Vector2 offsetVector = directionOffset.get(direction);</span>
+<span class="fc" id="L146">      playerPosition.add(offsetVector);</span>
+<span class="fc" id="L147">      return true;</span>
+    } else {
+<span class="fc" id="L149">      return false;</span>
+    }
+  }
+
+
+  /**
+   * Returns whether the player can move in the specified direction.
+   */
+  private boolean canMove(Direction direction) {
+<span class="fc" id="L158">    Vector2 offsetVector = directionOffset.get(direction);</span>
+
+    //stores the current mapGraph locally
+<span class="fc" id="L161">    Map&lt;Vector2, List&lt;Vector2&gt;&gt; tempMap = map.getFullMap();</span>
+
+    // Checks if the player is currently on NOT the map should always be false
+<span class="pc bpc" id="L164" title="1 of 2 branches missed.">    if (!tempMap.containsKey(playerPosition)) {</span>
+<span class="nc" id="L165">      sendToSpawnPoint();</span>
+<span class="nc" id="L166">      System.out.println(&quot;Player has Left the Map&quot;);</span>
+    }
+<span class="fc" id="L168">    List&lt;Vector2&gt; tempEdges = tempMap.get(playerPosition);</span>
+    //returns true if the tile to move to is a valid path to move to
+<span class="fc" id="L170">    return (tempEdges.contains(playerPosition.cpy().add(offsetVector)));</span>
+  }
+
+  /**
+   * Attempt to perform the specified activity.
+   *
+   * @param activity the activity to perform
+   * @return true if the activity was successfully performed
+   */
+  public boolean performActivity(Activity activity) {
+    //if the activity is Sleep, the time and energy is reset
+    //and the counter of the day increments
+<span class="fc bfc" id="L182" title="All 2 branches covered.">    if (activity instanceof Sleep) {</span>
+
+<span class="fc" id="L184">      week.add(currentDay);</span>
+      //if the day counter is greater than 6 the game ends
+<span class="fc bfc" id="L186" title="All 2 branches covered.">      if (week.size() == 7) {</span>
+<span class="fc" id="L187">        this.gameOver = true;</span>
+<span class="fc" id="L188">        return true;</span>
+      }
+
+      //time and energy reset otherwise
+<span class="fc" id="L192">      this.currentDay = new Day();</span>
+<span class="fc" id="L193">      this.energy = this.maxEnergy;</span>
+<span class="fc" id="L194">      this.time = this.timeInDay;</span>
+
+<span class="fc" id="L196">      return true;</span>
+    }
+
+
+    //if the activity is Eat, study or recreation, then the time and energy is decremented
+    //by the desired amount and the activity is recorded in the ArrayList
+<span class="fc bfc" id="L202" title="All 2 branches covered.">    if ((activity.getEnergyConsumption() &lt;= this.energy)</span>
+<span class="fc bfc" id="L203" title="All 2 branches covered.">        &amp;&amp; (activity.getTimeConsumption() &lt;= this.time)) {</span>
+
+<span class="fc" id="L205">      currentDay.addActivity(activity);</span>
+
+<span class="fc" id="L207">      int tempTime = activity.getTimeConsumption();</span>
+<span class="fc" id="L208">      int tempEnergy = activity.getEnergyConsumption();</span>
+<span class="fc" id="L209">      this.time = this.time - tempTime;</span>
+<span class="fc" id="L210">      this.energy = this.energy - tempEnergy;</span>
+
+<span class="fc" id="L212">      return true;</span>
+
+    }
+
+<span class="fc" id="L216">    return false;</span>
+  }
+
+
+  /**
+   * Returns the list of activities available at the player's current position.
+   *
+   * @return the activities
+   */
+  public ArrayList&lt;Activity&gt; getActivities() {
+
+    //gets the player position and stores it locally
+<span class="fc" id="L228">    playerPosition = character.getPosition();</span>
+
+    //gets the map of the nodes and stores it locally
+<span class="fc" id="L231">    Map&lt;Vector2, Node&gt; tempNodeMap = map.getNodeMap();</span>
+
+    //loops through each tile to try and find the tile that the player is currently on
+<span class="pc bpc" id="L234" title="1 of 2 branches missed.">    if (tempNodeMap.containsKey(playerPosition)) {</span>
+<span class="fc" id="L235">      return tempNodeMap.get(playerPosition).getActivities();</span>
+    }
+
+    //if no list is found then the empty list is returned
+    // This should never occur as it means the player has left the map
+<span class="nc" id="L240">    return new ArrayList&lt;&gt;();</span>
+  }
+
+  /**
+   * Gets name.
+   *
+   * @return the name
+   */
+  public String getName() {
+<span class="nc" id="L249">    return playerName;</span>
+  }
+
+  /**
+   * Sets name.
+   *
+   * @param name the name
+   */
+  public void setName(String name) {
+<span class="nc" id="L258">    playerName = name;</span>
+<span class="nc" id="L259">  }</span>
+
+  /**
+   * Save score.
+   */
+  public void saveScore() {
+<span class="nc" id="L265">    this.score = ScoreManager.calculateScore(week);</span>
+<span class="nc" id="L266">  }</span>
+
+  /**
+   * Gets score.
+   *
+   * @return the score
+   */
+  public int getScore() {
+<span class="nc" id="L274">    return this.score;</span>
+  }
+
+  /**
+   * Gets score.
+   *
+   * @return the score
+   */
+  public Map&lt;String, Integer&gt; getActivityCount() {
+<span class="nc" id="L283">    List&lt;Day&gt; tempWeek = new ArrayList&lt;&gt;(week);</span>
+<span class="nc" id="L284">    tempWeek.add(currentDay);</span>
+<span class="nc" id="L285">    return ScoreManager.scoreCount(tempWeek);</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
